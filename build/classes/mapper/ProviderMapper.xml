@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ProviderDao">
+
+	<!-- 查找供应商列表 -->
+	<select id="providerlist" resultType="Provider">
+		SELECT * FROM smbms_provider
+		<where>
+			<if test="queryProCode!=null and queryProCode!= ''">
+				and proCode LIKE CONCAT("%",#{queryProCode},"%")
+			</if>
+			<if test="queryProName!=null and queryProName!= ''">
+				AND proName LIKE CONCAT("%",#{queryProName},"%")
+			</if>
+		</where>
+	</select>
+
+	<!-- 通过 id 查找供应商 -->
+	<select id="findByUid" parameterType="int" resultType="Provider">
+		SELECT *
+		FROM smbms_provider where id = #{uid}
+	</select>
+
+	<!-- 删除指定供应商 -->
+	<delete id="delpro" parameterType="int">
+		DELETE FROM smbms_provider
+		WHERE id = #{proid}
+	</delete>
+
+	<!-- 修改指定供应商的信息 -->
+	<update id="updatePro" parameterType="Provider">
+		UPDATE smbms_provider
+		<trim prefix="set" suffix="WHERE proCode = #{proCode}" suffixOverrides=",">
+			<if test="proName!=null">
+				proName=#{proName},
+			</if>
+			<if test="proDesc!=null">
+				proDesc =#{proDesc},
+			</if>
+			<if test="proContact!=null">
+				proContact = #{proContact},
+			</if>
+			<if test="proPhone!=null">
+				proPhone = #{proPhone},
+			</if>
+			<if test="proAddress!=null">
+				proAddress =#{proAddress},
+			</if>
+			<if test="proFax!=null">
+				proFax = #{proFax},
+			</if>
+			<if test="createdBy!=null">
+				createdBy =#{createdBy},
+			</if>
+			<if test="creationDate!=null">
+				creationDate = #{creationDate},
+			</if>
+			<if test="modifyDate!=null">
+				modifyDate =#{modifyDate},
+			</if>
+			<if test="modifyBy!=null">
+				modifyBy =#{modifyBy},
+			</if>
+		</trim>
+	</update>
+
+	<!-- 添加供应商 addpro -->
+	<insert id="addpro" parameterType="Provider">
+		INSERT INTO
+		smbms.smbms_provider
+		(id, proCode, proName, proDesc, proContact, proPhone, proAddress, proFax,
+		createdBy, creationDate, modifyDate, modifyBy)
+		VALUES(#{id}, #{proCode}, #{proName}, #{proDesc}, #{proContact}, #{proPhone},
+		#{proAddress}, #{proFax}, #{createdBy}, #{creationDate},
+		#{modifyDate}, #{modifyBy})
+	</insert>
+
+</mapper>

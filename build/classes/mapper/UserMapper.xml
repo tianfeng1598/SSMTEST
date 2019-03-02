@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserDao">
+
+	<!-- 通过 code 查找用户 -->
+	<select id="findByCode" parameterType="string" resultType="User">
+		SELECT * FROM smbms_user where userCode = #{userCode}
+	</select>
+	
+	<!-- 通过 id 查找用户 -->
+	<select id="findByUid" parameterType="int" resultType="User">
+		SELECT * FROM smbms_user where id = #{uid}
+	</select>
+
+	<!-- 通过username 模糊查询 -->
+	<select id="findByName" parameterType="string" resultType="User">
+		SELECT * FROM smbms_user where userName like CONCAT ('%',#{name},'%')
+	</select>
+
+	<!-- 查找用户列表 -->
+	<select id="userlist" resultType="User">
+		SELECT
+		U.id,U.userCode,U.userName,U.gender,FLOOR(DATEDIFF(NOW(),birthday)/365)
+		AS age,U.phone,R.roleName AS userRoleName
+		FROM smbms_user U INNER JOIN smbms_role R ON U.userRole = R.id
+		<where>
+			<if test="queryname!=null and queryname!= ''">
+				and username LIKE CONCAT("%",#{queryname},"%")
+			</if>
+			<if test="queryUserRole!=null and queryUserRole!= ''">
+				 AND U.userRole = #{queryUserRole}
+			</if>
+		</where>
+	</select>
+
+	<!-- 新增用户 -->
+	<insert id="addUser" parameterType="User">
+		INSERT INTO
+		smbms_user(userCode,userName,userPassword,gender,birthday, 
+		phone, 	address, 	userRole,	createdBy,	creationDate
+		)
+		VALUES(#{userCode},#{userName},#{userPassword},#{gender},
+		#{birthday},#{phone},#{address},#{userRole},#{createdBy},NOW()
+		)
+	</insert>
+
+	<!-- 通过用户的id进行删除操作 -->
+	<delete id="delUser" parameterType="int">
+		DELETE FROM smbms_user 	WHERE id = #{uid}
+	</delete>
+	
+	<!-- 修改指定用户的信息 -->
+	<update id="updateUser" parameterType="User">
+		UPDATE smbms_user
+		<trim prefix="set" suffix="WHERE id = #{id}" suffixOverrides=",">
+			<if test="userCode!=null">
+				userCode =#{userCode},
+			</if>
+			<if test="userName!=null">
+				userName=#{userName},
+			</if>
+			<if test="userPassword!=null">
+				userPassword =#{userPassword},
+			</if>
+			<if test="createdBy!=null">
+				createdBy = #{createdBy},
+			</if>
+			<if test="creationDate!=null">
+				creationDate = #{creationDate},
+			</if>
+			<if test="gender!=null">
+				gender =#{gender},
+			</if>
+			<if test="address!=null">
+				address = #{address},
+			</if>
+			<if test="birthday!=null">
+				birthday =#{birthday},
+			</if>
+			<if test="modifyBy!=null">
+				modifyBy = #{modifyBy}, 
+			</if>
+			<if test="modifyDate!=null">
+				modifyDate =#{modifyDate},
+			</if>
+			<if test="phone!=null">
+				phone =#{phone},
+			</if>
+			<if test="userRole!=null">
+				userRole=#{userRole},
+			</if>
+		</trim>
+	</update>
+
+	<!-- 修改指定用户密码 -->
+	<update id="updatePwd">
+		UPDATE smbms_user SET userPassword = #{newpassword}  WHERE id = #{id}
+	</update>
+
+	<!-- 查询用户数量 -->
+	<select id="getTotalCount" resultType="int">
+    <![CDATA[
+    SELECT COUNT(id) FROM smbms_user]]>
+	</select>
+
+</mapper>
